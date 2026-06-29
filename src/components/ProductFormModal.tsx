@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import type { FormEvent } from 'react'
+import { useRef, useState, useCallback } from 'react'
+import type { FormEvent, ChangeEvent, DragEvent } from 'react'
 import type { ProductForm as ProductFormType } from '../types'
 import { formatPriceInput } from '../utils/format'
 import { CloseIcon } from '../utils/icons'
@@ -17,19 +17,39 @@ type Props = {
 export function ProductFormModal({ form, files, saving, onFormChange, onFilesChange, onSave, onClose }: Props) {
   const [previews, setPreviews] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [dragging, setDragging] = useState(false)
+  const [touched, setTouched] = useState<Record<string, boolean>>({})
 
-  const allPreviews = [
-    ...previews,
-    ...form.images,
-  ]
+  const allPreviews = [...previews, ...form.images]
 
-  const handleFilePick = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const picked = Array.from(e.target.files || [])
-    if (picked.length === 0) return
-    const urls = picked.map(f => URL.createObjectURL(f))
+  const errors: Record<string, string> = {}
+  if (touched.title && !form.title.trim()) errors.title = 'Nomi kiritilishi shart'
+  if (touched.price && !form.price) errors.price = 'Narxi kiritilishi shart'
+  if (touched.description && !form.description.trim()) errors.description = 'Tavsif kiritilishi shart'
+
+  const addFiles = useCallback((newFiles: File[]) => {
+    if (newFiles.length === 0) return
+    const urls = newFiles.map(f => URL.createObjectURL(f))
     setPreviews(prev => [...prev, ...urls])
-    onFilesChange([...files, ...picked])
+    onFilesChange([...files, ...newFiles])
+  }, [onFilesChange, files])
+
+  const handleFilePick = (e: ChangeEvent<HTMLInputElement>) => {
+    addFiles(Array.from(e.target.files || []))
     if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  const handleDragOver = (e: DragEvent) => {
+    e.preventDefault()
+    setDragging(true)
+  }
+
+  const handleDragLeave = () => setDragging(false)
+
+  const handleDrop = (e: DragEvent) => {
+    e.preventDefault()
+    setDragging(false)
+    addFiles(Array.from(e.dataTransfer.files || []).filter(f => f.type.startsWith('image/')))
   }
 
   const removeFile = (index: number) => {
@@ -42,14 +62,17 @@ export function ProductFormModal({ form, files, saving, onFormChange, onFilesCha
       setPreviews(newPreviews)
     } else {
       const imgIndex = index - files.length
-      const newImages = form.images.filter((_, i) => i !== imgIndex)
-      onFormChange({ ...form, images: newImages })
+      onFormChange({ ...form, images: form.images.filter((_, i) => i !== imgIndex) })
     }
+  }
+
+  const handleBlur = (name: string) => {
+    setTouched(prev => ({ ...prev, [name]: true }))
   }
 
   return (
     <div className="overlay" onClick={onClose}>
-      <form className="modal" onClick={e => e.stopPropagation()} onSubmit={onSave}>
+      <form className="modal form-modal" onClick={e => e.stopPropagation()} onSubmit={onSave} noValidate>
         <div className="modal__header">
           <h2>{form.id ? 'Mahsulotni tahrirlash' : 'Yangi mahsulot'}</h2>
           <button type="button" className="btn btn--ghost btn--icon" onClick={onClose} aria-label="Yopish">
@@ -57,17 +80,26 @@ export function ProductFormModal({ form, files, saving, onFormChange, onFilesCha
           </button>
         </div>
 
-        <label className="field">
-          Nomi
+        <div className={`field ${errors.title ? 'field--error' : ''}`}>
+          <span className="field__label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2 H12 M12 22"/><path d="M4.93 4.93 H4.93 M19.07 19.07"/><path d="M2 12 H22 M4.93 19.07 H4.93 M19.07 4.93 H19.07"/></svg>
+            Nomi
+          </span>
           <input
             required
             value={form.title}
             onChange={e => onFormChange({ ...form, title: e.target.value })}
+            onBlur={() => handleBlur('title')}
+            placeholder="Mahsulot nomini kiriting"
           />
-        </label>
+          {errors.title && <span className="field__error">{errors.title}</span>}
+        </div>
 
-        <label className="field">
-          Narxi (so'm)
+        <div className={`field ${errors.price ? 'field--error' : ''}`}>
+          <span className="field__label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Narxi (so'm)
+          </span>
           <div style={{ position: 'relative' }}>
             <input
               required
@@ -78,59 +110,92 @@ export function ProductFormModal({ form, files, saving, onFormChange, onFilesCha
                 const digits = e.target.value.replace(/[^\d]/g, '')
                 onFormChange({ ...form, price: digits })
               }}
-              style={{ paddingRight: 48 }}
+              onBlur={() => handleBlur('price')}
+              placeholder="0"
             />
           </div>
-        </label>
+          {errors.price && <span className="field__error">{errors.price}</span>}
+        </div>
 
-        <label className="field">
-          Rasmlar
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleFilePick}
-          />
-        </label>
-
-        {allPreviews.length > 0 && (
-          <div className="image-grid">
-            {allPreviews.map((src, i) => (
-              <div key={i} className="image-grid__item">
-                <img src={src} alt="" />
-                <button
-                  type="button"
-                  className="image-grid__remove"
-                  onClick={() => removeFile(i)}
-                  aria-label="Rasmni olib tashlash"
-                >
-                  <CloseIcon size={12} />
-                </button>
-              </div>
-            ))}
+        <div className="field">
+          <span className="field__label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            Rasmlar
+          </span>
+          <div
+            className={`dropzone ${dragging ? 'dropzone--active' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFilePick}
+              style={{ display: 'none' }}
+            />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <span>{dragging ? 'Rasmlarni tashlang' : 'Rasmlarni yuklash uchun bosing yoki tashlang'}</span>
+            <span className="dropzone__hint">PNG, JPG, WEBP — bir nechta rasm tanlash mumkin</span>
           </div>
-        )}
 
-        {form.images.length === 0 && files.length === 0 && form.id && (
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-tertiary)', marginTop: -8 }}>
-            Rasm talab qilinmaydi (mavjud rasmlar saqlanadi)
-          </p>
-        )}
+          {allPreviews.length > 0 && (
+            <div className="image-grid">
+              {allPreviews.map((src, i) => (
+                <div key={i} className="image-grid__item" style={{ animationDelay: `${i * 40}ms` }}>
+                  <img src={src} alt="" />
+                  <button
+                    type="button"
+                    className="image-grid__remove"
+                    onClick={() => removeFile(i)}
+                    aria-label="Rasmni olib tashlash"
+                  >
+                    <CloseIcon size={12} />
+                  </button>
+                </div>
+              ))}
+              <div className="image-grid__add" onClick={() => fileInputRef.current?.click()}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              </div>
+            </div>
+          )}
 
-        <label className="field" style={{ marginTop: 12 }}>
-          Tavsif
+          {form.images.length === 0 && files.length === 0 && form.id && (
+            <p className="field__hint">Rasm talab qilinmaydi (mavjud rasmlar saqlanadi)</p>
+          )}
+        </div>
+
+        <div className={`field ${errors.description ? 'field--error' : ''}`}>
+          <span className="field__label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Tavsif
+          </span>
           <textarea
             required
             rows={4}
             value={form.description}
             onChange={e => onFormChange({ ...form, description: e.target.value })}
+            onBlur={() => handleBlur('description')}
+            placeholder="Mahsulot haqida batafsil ma'lumot"
           />
-        </label>
+          {errors.description && <span className="field__error">{errors.description}</span>}
+        </div>
 
-        <button className="btn btn--primary" disabled={saving} type="submit">
-          {saving ? 'Saqlanmoqda...' : form.id ? 'Yangilash' : 'Yaratish'}
-        </button>
+        <div className="form-modal__footer">
+          <button type="button" className="btn btn--ghost" onClick={onClose}>Bekor qilish</button>
+          <button className="btn btn--primary" disabled={saving} type="submit">
+            {saving ? (
+              <span className="btn__spinner" />
+            ) : form.id ? 'Yangilash' : 'Yaratish'}
+          </button>
+        </div>
       </form>
     </div>
   )
