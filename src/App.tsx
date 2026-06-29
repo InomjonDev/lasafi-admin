@@ -23,6 +23,9 @@ import { Toast } from './components/Toast'
 import { PlusIcon } from './utils/icons'
 import './App.css'
 
+const PAGE_SIZE = 20
+const DRAFT_KEY = 'lasafi-product-draft'
+
 function App() {
   const { session, authLoading, logout } = useAuth()
 
@@ -37,6 +40,8 @@ function App() {
   const [toast, setToast] = useState<ToastMsg | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<ConfirmDelete | null>(null)
+  const [productPage, setProductPage] = useState(1)
+  const [orderPage, setOrderPage] = useState(1)
 
   const showToast = useCallback((msg: string, type: 'success' | 'error') => setToast({ msg, type }), [])
 
@@ -79,6 +84,14 @@ function App() {
     revenue: ordersCtrl.orders.reduce((sum, o) => sum + (o.price || 0), 0),
   }), [productsCtrl.products, ordersCtrl.orders])
 
+  /* ---- Auto-save draft ---- */
+  useEffect(() => {
+    if (!showForm) return
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ form, files: files.map(f => f.name) }))
+    } catch { /* ignore quota */ }
+  }, [form, files, showForm])
+
   const handleSave = async (e: FormEvent) => {
     e.preventDefault()
     setSaving(true)
@@ -87,6 +100,7 @@ function App() {
       setForm(blankForm)
       setFiles([])
       setShowForm(false)
+      localStorage.removeItem(DRAFT_KEY)
       showToast(result.type === 'updated' ? 'Mahsulot yangilandi' : 'Mahsulot yaratildi', 'success')
     } catch (err) {
       if (err instanceof AuthError) return
@@ -130,17 +144,42 @@ function App() {
   }
 
   const toggleForm = () => {
-    if (showForm) { setForm(blankForm); setFiles([]) }
+    if (showForm) {
+      setForm(blankForm)
+      setFiles([])
+      localStorage.removeItem(DRAFT_KEY)
+    } else {
+      try {
+        const raw = localStorage.getItem(DRAFT_KEY)
+        if (raw) {
+          const saved = JSON.parse(raw)
+          if (saved.form) setForm(saved.form)
+        }
+      } catch { /* ignore */ }
+    }
     setShowForm(!showForm)
   }
 
   const handleTabChange = (t: Tab) => {
     setTab(t)
     setQuery('')
+    setProductPage(1)
+    setOrderPage(1)
+  }
+
+  const handleSearch = (q: string) => {
+    setQuery(q)
+    setProductPage(1)
+    setOrderPage(1)
   }
 
   const handleRefresh = () => loadAll()
   const handleLogout = () => logout()
+
+  const paginatedProducts = useMemo(() => filteredProducts.slice(0, productPage * PAGE_SIZE), [filteredProducts, productPage])
+  const paginatedOrders = useMemo(() => filteredOrders.slice(0, orderPage * PAGE_SIZE), [filteredOrders, orderPage])
+  const hasMoreProducts = paginatedProducts.length < filteredProducts.length
+  const hasMoreOrders = paginatedOrders.length < filteredOrders.length
 
   if (authLoading) {
     return (
@@ -194,7 +233,7 @@ function App() {
 
         <SearchBar
           value={query}
-          onChange={setQuery}
+          onChange={handleSearch}
           placeholder={tab === 'products' ? 'Mahsulotlarni qidirish...' : 'Buyurtmalarni qidirish...'}
         />
 
@@ -207,7 +246,7 @@ function App() {
               <PlusIcon /> Mahsulot qo'shish
             </button>
             <div className="card-list">
-              {filteredProducts.map(p => (
+              {paginatedProducts.map(p => (
                 <ProductCard
                   key={p.id}
                   product={p}
@@ -222,6 +261,11 @@ function App() {
                 </div>
               )}
             </div>
+            {hasMoreProducts && (
+              <button className="btn btn--load-more" onClick={() => setProductPage(p => p + 1)}>
+                Yana yuklash ({filteredProducts.length - paginatedProducts.length} ta)
+              </button>
+            )}
 
             <button className="fab" onClick={toggleForm} aria-label="Mahsulot qo'shish">
               <PlusIcon size={24} />
@@ -243,7 +287,7 @@ function App() {
           <>
             {ordersCtrl.error && <div className="notice notice--error">{ordersCtrl.error}</div>}
             <div className="card-list">
-              {filteredOrders.map(o => (
+              {paginatedOrders.map(o => (
                 <OrderCard
                   key={o.id}
                   order={o}
@@ -259,6 +303,11 @@ function App() {
                 </div>
               )}
             </div>
+            {hasMoreOrders && (
+              <button className="btn btn--load-more" onClick={() => setOrderPage(p => p + 1)}>
+                Yana yuklash ({filteredOrders.length - paginatedOrders.length} ta)
+              </button>
+            )}
           </>
         )}
 

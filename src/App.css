@@ -547,6 +547,29 @@
   border-radius: var(--radius-sm);
 }
 
+/* ---- Load More ---- */
+.btn--load-more {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-3);
+  padding: 12px;
+  border: 1px dashed var(--color-line);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+}
+
+.btn--load-more:hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  background: rgba(198, 156, 76, 0.04);
+}
+
 /* ---- Desktop Add Button ---- */
 .btn--add-desktop {
   display: none;
