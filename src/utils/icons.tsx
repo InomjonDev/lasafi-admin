@@ -69,3 +69,19 @@ export function EmptyTagIcon(props: Props) {
 export function EmptyCartIcon(props: Props) {
   return <Svg size={32} strokeWidth="1.5" {...props}><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/></Svg>
 }
+
+export function UsersIcon(props: Props) {
+  return <Svg {...props}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></Svg>
+}
+
+export function EyeIcon(props: Props) {
+  return <Svg {...props}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></Svg>
+}
+
+export function MousePointerIcon(props: Props) {
+  return <Svg {...props}><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z"/><path d="M13 13l6 6"/></Svg>
+}
+
+export function BarChartIcon(props: Props) {
+  return <Svg {...props}><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></Svg>
+}

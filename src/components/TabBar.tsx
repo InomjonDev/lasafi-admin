@@ -1,4 +1,5 @@
 import type { Tab } from '../types'
+import styles from './TabBar.module.css'
 
 type Props = {
   active: Tab
@@ -7,9 +8,9 @@ type Props = {
 
 export function TabBar({ active, onChange }: Props) {
   return (
-    <div className="tabs" role="tablist">
+    <div className={styles.tabs} role="tablist">
       <button
-        className={`tab ${active === 'products' ? 'tab--active' : ''}`}
+        className={`${styles.tab} ${active === 'products' ? styles.tabActive : ''}`}
         onClick={() => onChange('products')}
         role="tab"
         aria-selected={active === 'products'}
@@ -17,12 +18,20 @@ export function TabBar({ active, onChange }: Props) {
         Mahsulotlar
       </button>
       <button
-        className={`tab ${active === 'orders' ? 'tab--active' : ''}`}
+        className={`${styles.tab} ${active === 'orders' ? styles.tabActive : ''}`}
         onClick={() => onChange('orders')}
         role="tab"
         aria-selected={active === 'orders'}
       >
         Buyurtmalar
+      </button>
+      <button
+        className={`${styles.tab} ${active === 'analytics' ? styles.tabActive : ''}`}
+        onClick={() => onChange('analytics')}
+        role="tab"
+        aria-selected={active === 'analytics'}
+      >
+        Analitika
       </button>
     </div>
   )

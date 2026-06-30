@@ -1,15 +1,40 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import type { Order } from '../types'
 import * as ordersApi from '../api/orders'
 import { AuthError } from '../api/client'
+import { supabase } from '../supabase'
 
-export function useOrders() {
+type Options = {
+  onNewOrder?: (order: Order) => void
+}
+
+function notifyOrder(order: Order) {
+  if (!('Notification' in window)) return
+  if (Notification.permission === 'granted') {
+    new Notification('Yangi buyurtma!', {
+      body: `${order.product_title} — ${order.customer_name}`,
+      icon: order.product_image || undefined,
+      tag: order.id,
+    })
+  }
+}
+
+function requestNotifyPermission() {
+  if (!('Notification' in window)) return
+  if (Notification.permission === 'default') {
+    Notification.requestPermission()
+  }
+}
+
+export function useOrders(options?: Options) {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [updatingStatus, setUpdatingStatus] = useState<string | null>(null)
+  const onNewOrderRef = useRef(options?.onNewOrder)
+  onNewOrderRef.current = options?.onNewOrder
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
@@ -22,7 +47,26 @@ export function useOrders() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
+
+  useEffect(() => { requestNotifyPermission() }, [])
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('orders-live')
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'orders' },
+        (payload) => {
+          const newOrder = payload.new as Order
+          setOrders(prev => [newOrder, ...prev])
+          notifyOrder(newOrder)
+          onNewOrderRef.current?.(newOrder)
+        },
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   const changeStatus = async (order: Order, status: string) => {
     const prevStatus = order.status

@@ -1,0 +1,32 @@
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  margin-bottom: var(--space-3);
+}
+
+.tab {
+  flex: 1;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border: 0;
+  border-radius: 7px;
+  padding: 9px;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+.tabActive {
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}

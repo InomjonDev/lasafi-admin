@@ -1,4 +1,5 @@
 import { SearchIcon } from '../utils/icons'
+import styles from './SearchBar.module.css'
 
 type Props = {
   value: string
@@ -8,10 +9,10 @@ type Props = {
 
 export function SearchBar({ value, onChange, placeholder = 'Qidirish...' }: Props) {
   return (
-    <div className="search-wrap">
+    <div className={styles.searchWrap}>
       <SearchIcon />
       <input
-        className="search"
+        className={styles.search}
         type="search"
         placeholder={placeholder}
         value={value}

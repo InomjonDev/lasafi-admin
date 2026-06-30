@@ -1,4 +1,5 @@
 import type { Product, Order } from '../types'
+import styles from './ConfirmDialog.module.css'
 
 type Props = {
   type: 'product' | 'order'
@@ -14,11 +15,11 @@ export function ConfirmDialog({ type, item, onConfirm, onCancel }: Props) {
     : `"${(item as Order).product_title}" buyurtmasi butunlay o'chiriladi.`
 
   return (
-    <div className="overlay overlay--confirm" onClick={onCancel}>
-      <div className="modal confirm" onClick={e => e.stopPropagation()}>
+    <div className={styles.overlay} onClick={onCancel}>
+      <div className={styles.confirm} onClick={e => e.stopPropagation()}>
         <h2>{title}</h2>
         <p>{message}</p>
-        <div className="confirm__actions">
+        <div className={styles.confirmActions}>
           <button className="btn btn--ghost" onClick={onCancel}>Bekor qilish</button>
           <button className="btn btn--danger" onClick={onConfirm}>O'chirish</button>
         </div>

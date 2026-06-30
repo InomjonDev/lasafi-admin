@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { CheckIcon, CloseIcon } from '../utils/icons'
+import styles from './Toast.module.css'
 
 type Props = {
   msg: string
@@ -14,7 +15,7 @@ export function Toast({ msg, type, onClose }: Props) {
   }, [onClose])
 
   return (
-    <div className={`toast toast--${type}`} onClick={onClose} role="alert">
+    <div className={`${styles.toast} ${type === 'success' ? styles.toastSuccess : styles.toastError}`} onClick={onClose} role="alert">
       {type === 'success' ? <CheckIcon /> : <CloseIcon />}
       {msg}
     </div>

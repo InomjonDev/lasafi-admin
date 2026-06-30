@@ -3,6 +3,7 @@ import { money, timeAgo } from '../utils/format'
 import { orderStatuses, statusLabels, statusColors } from '../utils/constants'
 import { DeleteIcon } from '../utils/icons'
 import { Select } from './Select'
+import styles from './OrderCard.module.css'
 
 type Props = {
   order: Order
@@ -13,25 +14,25 @@ type Props = {
 
 export function OrderCard({ order, updatingStatus, onStatusChange, onDelete }: Props) {
   return (
-    <article className="card card--order">
-      <div className="card__order-header">
-        <h3 className="card__order-title">{order.product_title}</h3>
-        <span className="card__order-date">{timeAgo(order.created_at)}</span>
+    <article className={`${styles.card} ${styles.cardOrder}`}>
+      <div className={styles.cardOrderHeader}>
+        <h3 className={styles.cardOrderTitle}>{order.product_title}</h3>
+        <span className={styles.cardOrderDate}>{timeAgo(order.created_at)}</span>
       </div>
-      <div className="card__row">
-        <span className="card__label">Mijoz</span>
+      <div className={styles.cardRow}>
+        <span className={styles.cardLabel}>Mijoz</span>
         <span>
           <strong>{order.customer_name}</strong>
-          <span className="card__sub">{order.phone}</span>
-          <span className="card__sub">{order.address}</span>
+          <span className={styles.cardSub}>{order.phone}</span>
+          <span className={styles.cardSub}>{order.address}</span>
         </span>
       </div>
-      <div className="card__row">
-        <span className="card__label">Jami</span>
+      <div className={styles.cardRow}>
+        <span className={styles.cardLabel}>Jami</span>
         <strong>{money.format(order.price || 0)} so'm</strong>
       </div>
-      <div className="card__row">
-        <span className="card__label">Holat</span>
+      <div className={styles.cardRow}>
+        <span className={styles.cardLabel}>Holat</span>
         <Select
           options={orderStatuses.map(s => ({
             value: s,
@@ -41,11 +42,11 @@ export function OrderCard({ order, updatingStatus, onStatusChange, onDelete }: P
           }))}
           value={order.status}
           disabled={updatingStatus === order.id}
-          style={{ opacity: updatingStatus === order.id ? 0.6 : 1 }}
+          className={updatingStatus === order.id ? styles.cardDisabled : undefined}
           onChange={v => onStatusChange(order, v)}
         />
       </div>
-      <div className="card__actions">
+      <div className={styles.cardActions}>
         <button className="btn btn--sm btn--danger" onClick={() => onDelete(order)}>
           <DeleteIcon /> O'chirish
         </button>

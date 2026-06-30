@@ -1,6 +1,7 @@
 import type { Product } from '../types'
 import { money } from '../utils/format'
 import { EditIcon, DeleteIcon } from '../utils/icons'
+import styles from './ProductCard.module.css'
 
 type Props = {
   product: Product
@@ -12,20 +13,20 @@ export function ProductCard({ product, onEdit, onDelete }: Props) {
   const firstImage = product.images?.[0] || ''
 
   return (
-    <article className="card card--product">
-      <div className="card__img-wrap">
+    <article className={`${styles.card} ${styles.cardProduct}`}>
+      <div className={styles.cardImgWrap}>
         {firstImage ? (
-          <img className="card__img" src={firstImage} alt={product.title} loading="lazy" />
+          <img className={styles.cardImg} src={firstImage} alt={product.title} loading="lazy" />
         ) : (
-          <div className="card__img card__img--empty" />
+          <div className={styles.cardImg} />
         )}
       </div>
-      <div className="card__body">
-        <h3 className="card__title">{product.title}</h3>
-        <p className="card__desc">{product.description}</p>
-        <span className="card__price">{money.format(product.price)} so'm</span>
+      <div className={styles.cardBody}>
+        <h3 className={styles.cardTitle}>{product.title}</h3>
+        <p className={styles.cardDesc}>{product.description}</p>
+        <span className={styles.cardPrice}>{money.format(product.price)} so'm</span>
       </div>
-      <div className="card__actions">
+      <div className={styles.cardActions}>
         <button className="btn btn--sm" onClick={() => onEdit(product)}>
           <EditIcon /> Tahrirlash
         </button>

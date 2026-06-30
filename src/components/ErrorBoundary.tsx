@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import type { ReactNode } from 'react'
 import { AlertIcon } from '../utils/icons'
+import styles from './ErrorBoundary.module.css'
 
 type Props = { children: ReactNode }
 type State = { error: Error | null }
@@ -15,7 +16,7 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.error) {
       return (
-        <div className="error-screen">
+        <div className={styles.errorScreen}>
           <AlertIcon />
           <h2>Nimadir xato ketdi</h2>
           <p>{this.state.error.message}</p>

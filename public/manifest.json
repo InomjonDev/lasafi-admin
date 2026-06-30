@@ -1,16 +1,22 @@
 {
   "name": "LaSafi Admin",
   "short_name": "LaSafi",
+  "description": "LaSafi diademlari boshqaruv paneli",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "lang": "uz",
+  "dir": "ltr",
+  "categories": ["business", "shopping"],
   "icons": [
     {
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": []
 }

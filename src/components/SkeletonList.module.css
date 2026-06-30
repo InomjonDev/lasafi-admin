@@ -1,0 +1,17 @@
+.skeletonList {
+  display: grid;
+  gap: 10px;
+}
+
+.skeletonCard {
+  height: 100px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, #ede8e0 25%, #e5dfd6 50%, #ede8e0 75%);
+  background-size: 200%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
