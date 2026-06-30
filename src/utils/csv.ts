@@ -1,15 +1,16 @@
 import type { Order } from '../types'
 
 export function exportOrdersToCsv(orders: Order[]) {
-  const header = ['ID', 'Mahsulot', 'Narxi', 'Mijoz', 'Telefon', 'Manzil', 'Soni', 'Holat', 'Sana']
+  const header = ['ID', 'Mahsulot', 'Narxi', 'Soni', 'Jami', 'Mijoz', 'Telefon', 'Manzil', 'Holat', 'Sana']
   const rows = orders.map(o => [
     o.id,
     o.product_title || '',
     String(o.price || 0),
+    String(o.quantity || 1),
+    String(o.total_price || ((o.price || 0) * (o.quantity || 1))),
     o.customer_name || '',
     o.phone || '',
     o.address || '',
-    String(o.quantity || 1),
     o.status || '',
     o.created_at || '',
   ])

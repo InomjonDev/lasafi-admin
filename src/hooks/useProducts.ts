@@ -34,6 +34,7 @@ export function useProducts() {
       description: form.description.trim(),
       price: Number(form.price),
       images,
+      quantity: Number(form.quantity) || 0,
     }
     if (form.id) {
       const updated = await productsApi.updateProduct(form.id, body)

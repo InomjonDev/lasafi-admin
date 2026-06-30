@@ -71,7 +71,7 @@ function App() {
     products: productsCtrl.products.length,
     orders: ordersCtrl.orders.length,
     newOrders: ordersCtrl.orders.filter(o => o.status === 'new').length,
-    revenue: ordersCtrl.orders.reduce((sum, o) => sum + (o.price || 0), 0),
+    revenue: ordersCtrl.orders.reduce((sum, o) => sum + (o.total_price || (o.price || 0) * (o.quantity || 1)), 0),
   }), [productsCtrl.products, ordersCtrl.orders])
 
   useEffect(() => {
@@ -132,7 +132,7 @@ function App() {
   }
 
   const handleEdit = (p: Product) => {
-    setForm({ id: p.id, title: p.title, description: p.description, price: String(p.price), images: p.images })
+    setForm({ id: p.id, title: p.title, description: p.description, price: String(p.price), images: p.images, quantity: String(p.quantity ?? 0) })
     setFiles([])
     setShowForm(true)
   }

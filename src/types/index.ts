@@ -4,6 +4,7 @@ export type Product = {
   description: string
   price: number
   images: string[]
+  quantity: number
 }
 
 export type Order = {
@@ -27,6 +28,7 @@ export type ProductForm = {
   description: string
   price: string
   images: string[]
+  quantity: string
 }
 
 export type Tab = 'products' | 'orders' | 'analytics'

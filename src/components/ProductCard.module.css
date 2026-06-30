@@ -74,6 +74,21 @@
   border-radius: var(--radius-full);
 }
 
+.cardMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.cardQuantity {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
 .cardActions {
   display: flex;
   gap: var(--space-2);

@@ -24,7 +24,10 @@ export function ProductCard({ product, onEdit, onDelete }: Props) {
       <div className={styles.cardBody}>
         <h3 className={styles.cardTitle}>{product.title}</h3>
         <p className={styles.cardDesc}>{product.description}</p>
-        <span className={styles.cardPrice}>{money.format(product.price)} so'm</span>
+        <div className={styles.cardMeta}>
+          <span className={styles.cardPrice}>{money.format(product.price)} so'm</span>
+          <span className={styles.cardQuantity}>Qoldiq: {product.quantity ?? 0} dona</span>
+        </div>
       </div>
       <div className={styles.cardActions}>
         <button className="btn btn--sm" onClick={() => onEdit(product)}>

@@ -28,8 +28,12 @@ export function OrderCard({ order, updatingStatus, onStatusChange, onDelete }: P
         </span>
       </div>
       <div className={styles.cardRow}>
+        <span className={styles.cardLabel}>Soni</span>
+        <strong>{order.quantity ?? 1} dona</strong>
+      </div>
+      <div className={styles.cardRow}>
         <span className={styles.cardLabel}>Jami</span>
-        <strong>{money.format(order.price || 0)} so'm</strong>
+        <strong>{money.format(order.total_price || (order.price || 0) * (order.quantity || 1))} so'm</strong>
       </div>
       <div className={styles.cardRow}>
         <span className={styles.cardLabel}>Holat</span>

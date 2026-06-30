@@ -189,6 +189,20 @@ export function ProductFormModal({ form, files, saving, onFormChange, onFilesCha
           {errors.description && <span className={styles.fieldErrorMsg}>{errors.description}</span>}
         </div>
 
+        <div className={`${styles.field}`}>
+          <span className={styles.fieldLabel}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Soni (qoldiq)
+          </span>
+          <input
+            type="number"
+            min="0"
+            value={form.quantity}
+            onChange={e => onFormChange({ ...form, quantity: e.target.value })}
+            placeholder="0"
+          />
+        </div>
+
         <div className={styles.formModalFooter}>
           <button type="button" className="btn btn--ghost" onClick={onClose}>Bekor qilish</button>
           <button className="btn btn--primary" disabled={saving} type="submit">

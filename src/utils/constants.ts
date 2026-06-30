@@ -18,4 +18,4 @@ export const statusColors: Record<string, { bg: string; text: string }> = {
   cancelled: { bg: '#fcf0f2', text: '#c46a7a' },
 }
 
-export const blankForm: ProductForm = { title: '', description: '', price: '', images: [] }
+export const blankForm: ProductForm = { title: '', description: '', price: '', images: [], quantity: '1' }
